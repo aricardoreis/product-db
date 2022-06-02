@@ -1,2 +1,2 @@
-# fut-db
-A FIFA Ultimate Team API
+# product-db
+A database which contains data about products selled by stores.

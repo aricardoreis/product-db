@@ -1,8 +1,8 @@
 {
   "type": "commonjs",
-  "name": "fut-db",
+  "name": "product-db",
   "version": "1.0.0",
-  "description": "A FIFA Ultimate Team database",
+  "description": "A database wich contains information about products selled by stores.",
   "main": "src/index.ts",
   "scripts": {
     "test": "jest",
@@ -12,28 +12,31 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aricardoreis/fut-db.git"
+    "url": "git+https://github.com/aricardoreis/product-db.git"
   },
   "keywords": [
-    "fut",
-    "fifa",
-    "soccer",
-    "player",
-    "team"
+    "product",
+    "store",
+    "price",
+    "sale",
+    "database"
   ],
   "author": "André Reis - arrr.cin@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/aricardoreis/fut-db/issues"
+    "url": "https://github.com/aricardoreis/product-db/issues"
   },
-  "homepage": "https://github.com/aricardoreis/fut-db#readme",
+  "homepage": "https://github.com/aricardoreis/product-db#readme",
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "ts-node": "^10.8.0",
     "typescript": "^4.7.2"
   },
   "dependencies": {
     "@types/cheerio": "^0.22.31",
     "axios": "^0.27.2",
-    "cheerio": "^1.0.0-rc.11"
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "puppeteer": "^14.2.1"
   }
 }
