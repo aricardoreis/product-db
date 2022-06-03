@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "build": "rimraf public && tsc",
+    "build": "tsc",
     "start": "node public/src/index.js",
     "start:dev": "npx ts-node ./src/index.ts",
     "postinstall": "npm run build"
