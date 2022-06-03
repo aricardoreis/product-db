@@ -7,8 +7,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "build": "rimraf ./build && tsc",
-    "start": "node ./build/index.js",
+    "build": "mkdir ./build && rimraf ./build && tsc",
+    "start": "node ./build/src/index.js",
     "start:dev": "npx ts-node ./src/index.ts",
     "postinstall": "npm run build"
   },
@@ -35,6 +35,7 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
+    "@netlify/functions": "^1.0.0",
     "@types/cheerio": "^0.22.31",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
