@@ -1,13 +1,28 @@
-import axios from 'axios';
-import cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 
-const main = async (url: string) => {
-    console.log('main');
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
-    const element = $('#article-show-primary-sticky-nav > div.crayons-card.crayons-card--secondary.branded-7.p-4.pt-0.gap-4.grid > div.-mt-4 > a > span.crayons-link.crayons-subtitle-2.mt-5');
-    console.log(element.text());
-}
+const url = 'http://nfce.sefaz.pe.gov.br/nfce/consulta?p=26220306057223042761650260000047251260098148%7C2%7C1%7C1%7C4DF204E1731C295B86D989CF8C0D729129257FA2';
 
-const url = 'https://dev.to/uiii/web-scraping-with-nodejs-and-typescript-the-scraper-part-ffn';
-main(url);
+const load = async () => {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+    await page.waitForSelector('#tabResult');
+
+    const elements = await page.$$eval('#tabResult > tbody > tr', data => {
+        return data.map(el =>
+        ({
+            name: el.querySelector('.txtTit')?.innerHTML,
+            code: el.querySelector('.RCod')?.innerHTML.split(' ')[1].split(')')[0],
+            quantity: el.querySelector('.Rqtd')?.innerHTML.split('>')[2],
+            value: el.querySelector('.RvlUnit')?.innerHTML.split('>')[2],
+            total: el.querySelector('.valor')?.innerHTML
+        }
+        ));
+    });
+
+    // save on database
+
+    await browser.close();
+};
+
+load();
