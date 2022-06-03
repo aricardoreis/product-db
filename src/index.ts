@@ -2,7 +2,7 @@ import express from 'express';
 import { load } from './scraper';
 
 const app = express();
-const port = 80;
+const port = 8080;
 
 app.get('/', (req, res) => {
     console.log('hello world');
