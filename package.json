@@ -8,8 +8,9 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "build": "tsc",
-    "start": "npm install typescript && npm i && npx tsc && node ./build/index.js",
-    "start:dev": "npx ts-node ./src/index.ts"
+    "start": "npm run build && node ./build/index.js",
+    "start:dev": "npx ts-node ./src/index.ts",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
