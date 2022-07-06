@@ -2,7 +2,7 @@
   "bindings": [
     {
       "authLevel": "Anonymous",
-      "type": "httpTrigger",
+      "type": "HttpTrigger",
       "direction": "in",
       "name": "req",
       "methods": [
@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/HttpTrigger/index.js"
+  "scriptFile": "../dist/http-trigger/index.js"
 }
