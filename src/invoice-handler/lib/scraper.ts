@@ -39,8 +39,8 @@ export class Scraper {
 
         await page.goto(url, { waitUntil: 'load' });
         const pageData = await page.evaluate((sel: string) => {
-            const divCount = document.querySelectorAll(sel).length;
-            return divCount;
+            const name = document.querySelectorAll(sel)[0].textContent;
+            return name;
         }, query);
 
         await page.close();
