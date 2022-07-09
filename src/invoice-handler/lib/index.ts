@@ -1,1 +1,1 @@
-export { Scraper } from './scraper';
+export { Scraper } from "./scraper";
