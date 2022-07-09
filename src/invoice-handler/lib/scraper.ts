@@ -21,9 +21,9 @@ export class Scraper {
       "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko";
 
     await page.evaluateOnNewDocument((fakeUserAgent) => {
-      let open = window.open;
+      const open = window.open;
       window.open = (...args) => {
-        let newPage = open(...args);
+        const newPage = open(...args);
         Object.defineProperty(newPage.navigator, "userAgent", {
           get: () => fakeUserAgent,
         });
