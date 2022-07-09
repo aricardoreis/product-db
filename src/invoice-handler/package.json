@@ -1,7 +1,6 @@
 {
   "name": "invoice-handler",
   "version": "1.0.0",
-  "description": "",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -16,5 +15,13 @@
   },
   "dependencies": {
     "puppeteer": "^15.3.0"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
