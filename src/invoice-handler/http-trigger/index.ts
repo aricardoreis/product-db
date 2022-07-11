@@ -1,20 +1,17 @@
-import { AzureFunction, Context } from "@azure/functions";
-import { Scraper } from "../lib";
+import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { Scraper } from "./lib/scraper";
 
 const httpTrigger: AzureFunction = async function (
-  context: Context
+  context: Context,
+  req: HttpRequest
 ): Promise<void> {
-  context.log("HTTP trigger function processed a request.");
+  const { url } = req.body;
 
-  console.log("************ STARTING **************");
-
-  const scraper = new Scraper("https://www.futbin.com");
-  const playerName = await scraper.load("22/player/26054", ".header_name");
-
-  console.log("name: " + playerName);
+  const scraper = Scraper.getInstance(url);
+  const data = await scraper.load();
 
   context.res = {
-    body: playerName,
+    body: items,
   };
 };
 
