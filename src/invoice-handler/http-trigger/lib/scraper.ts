@@ -42,7 +42,16 @@ export class Scraper {
     const sale = await this.page.evaluate((sel: string) => {
       const sale = {
         products: [],
+        store: {
+          name: "",
+          address: "",
+        },
+        total: 0,
+        itemsCount: 0,
+        date: undefined,
+        accessKey: "",
       };
+
       const rows = Array.from(document.querySelectorAll(sel));
       rows.forEach((item) => {
         const unitType = item.querySelector(".RUN").textContent.split(" ")[1];
@@ -73,6 +82,32 @@ export class Scraper {
           type: unitType,
         });
       });
+
+      sale.store.name = document
+        .querySelector("#conteudo .txtTopo")
+        .textContent.trim();
+      sale.store.address = document
+        .querySelectorAll("#conteudo .text")[1]
+        .textContent.split(",")
+        .map((i) => i.trim())
+        .join(", ");
+      sale.itemsCount = parseInt(
+        document.querySelectorAll(".totalNumb")[0].textContent.replace(",", ".")
+      );
+      sale.total = parseFloat(
+        document.querySelectorAll(".totalNumb")[1].textContent.replace(",", ".")
+      );
+      const datePart = document.querySelector(
+        "#infos > div:nth-child(1) > div > ul > li"
+      ).textContent;
+      const dateTokens = datePart
+        .match(/(\d{4}([.\-/ ])\d{2}\2\d{2}|\d{2}([.\-/ ])\d{2}\3\d{4})/)[0]
+        .split("/")
+        .map((i) => parseInt(i));
+      sale.date = dateTokens.join("/");
+      sale.accessKey = document
+        .querySelector("#infos > div:nth-child(2) > div > ul > li")
+        .textContent.split(":")[2];
 
       return sale;
     }, "#tabResult tr");

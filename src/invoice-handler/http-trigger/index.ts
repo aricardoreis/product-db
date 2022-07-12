@@ -11,7 +11,7 @@ const httpTrigger: AzureFunction = async function (
   const data = await scraper.load();
 
   context.res = {
-    body: items,
+    body: data,
   };
 };
 
