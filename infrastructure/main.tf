@@ -52,7 +52,7 @@ resource "azurerm_function_app" "function_app" {
   location            = var.location
   app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
   app_settings = {
-    "WEBSITE_RUN_FROM_PACKAGE"       = "",
+    "WEBSITE_RUN_FROM_PACKAGE"       = "true",
     "FUNCTIONS_WORKER_RUNTIME"       = "node",
     "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.application_insights.instrumentation_key,
   }
@@ -100,5 +100,18 @@ resource "azurerm_cosmosdb_sql_container" "invoices" {
   resource_group_name = azurerm_resource_group.rg.name
   account_name        = azurerm_cosmosdb_account.cosmos-db.name
   database_name       = azurerm_cosmosdb_sql_database.db.name
-  partition_key_path  = "/id"
+  partition_key_path  = "/date"
+
+  indexing_policy {
+    indexing_mode = "Consistent"
+
+    included_path {
+      path = "/date/?"
+    }
+
+    excluded_path {
+      path = "/*"
+    }
+
+  }
 }
