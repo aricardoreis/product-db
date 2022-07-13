@@ -22,11 +22,10 @@ export interface Store {
   address: string;
 }
 
-export class Sale {
+export class Invoice {
   constructor() {
     this.products = [];
   }
-  id: number;
   store: Store;
   products: Item[];
   itemsCount: number;

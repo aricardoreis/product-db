@@ -1,4 +1,5 @@
 import * as puppeteer from "puppeteer";
+import { Invoice } from "./models";
 
 export class Scraper {
   private static instance: Scraper;
@@ -114,7 +115,7 @@ export class Scraper {
 
     this.close();
 
-    return sale;
+    return sale as Invoice;
   };
 
   public close = async () => {

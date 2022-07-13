@@ -1,4 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { insertInvoice } from "./lib/db";
 import { Scraper } from "./lib/scraper";
 
 const httpTrigger: AzureFunction = async function (
@@ -9,9 +10,10 @@ const httpTrigger: AzureFunction = async function (
 
   const scraper = Scraper.getInstance(url);
   const data = await scraper.load();
+  const result = await insertInvoice(data);
 
   context.res = {
-    body: data,
+    body: result,
   };
 };
 

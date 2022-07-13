@@ -100,13 +100,13 @@ resource "azurerm_cosmosdb_sql_container" "invoices" {
   resource_group_name = azurerm_resource_group.rg.name
   account_name        = azurerm_cosmosdb_account.cosmos-db.name
   database_name       = azurerm_cosmosdb_sql_database.db.name
-  partition_key_path  = "/date"
+  partition_key_path  = "/accessKey"
 
   indexing_policy {
     indexing_mode = "Consistent"
 
     included_path {
-      path = "/date/?"
+      path = "/accessKey/?"
     }
 
     excluded_path {
