@@ -6,7 +6,10 @@
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
-    "test": "echo \"No tests yet...\""
+    "test": "echo \"No tests yet...\"",
+    "package": "npm run build && zip -r app.zip .",
+    "upload": "az functionapp deployment source config-zip --timeout 3600 -g productdb-dev-rg -n productdb-dev-fn-app --src ./app.zip --debug",
+    "deploy": "npm run package && npm run upload"
   },
   "devDependencies": {
     "@azure/functions": "^3.0.0",
