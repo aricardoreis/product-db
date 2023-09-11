@@ -395,6 +395,10 @@ Temporary Items
 =======
 # Local
 .env
+.env-*
 dist
 .webpack
 .serverless/**/*.zip
+
+# temp configuration to hide users related files
+src/users/
