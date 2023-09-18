@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Product } from './product.entity';
+import { Sale } from '../../sales/entity/sale.entity';
 
 @Entity({
   name: 'price_history',
@@ -22,6 +23,10 @@ export class PriceHistory {
 
   @Column()
   sale_id: string;
+
+  @ManyToOne(() => Sale)
+  @JoinColumn({ name: 'sale_id' })
+  sale: Sale;
 
   @ManyToOne(() => Product)
   @JoinColumn({ name: 'product_id' })

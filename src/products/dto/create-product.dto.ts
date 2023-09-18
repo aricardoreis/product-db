@@ -3,4 +3,7 @@ export class CreateProductDto {
   code: string;
   amount: number;
   type: string;
+  value: number;
+  date: string;
+  saleId: string;
 }
