@@ -31,4 +31,15 @@ export class PriceHistory {
   @ManyToOne(() => Product)
   @JoinColumn({ name: 'product_id' })
   product: Product;
+
+  static fromJson(data: any): PriceHistory {
+    return {
+      id: data.id,
+      value: parseFloat(data.value),
+      date: data.date,
+      sale_id: data.sale_id,
+      sale: data.sale,
+      product: data.product,
+    };
+  }
 }

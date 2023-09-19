@@ -25,4 +25,18 @@ export class Product {
 
   @OneToMany(() => PriceHistory, (priceHistory) => priceHistory.product)
   priceHistory: PriceHistory[];
+
+  static fromJSON(data: any): Product {
+    return {
+      id: data.id,
+      name: data.name,
+      code: data.code,
+      amount: data.amount,
+      type: data.type,
+      isEan: undefined,
+      priceHistory: data.priceHistory.map((priceHistory) =>
+        PriceHistory.fromJson(priceHistory),
+      ),
+    };
+  }
 }

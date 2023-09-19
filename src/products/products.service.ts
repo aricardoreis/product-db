@@ -14,13 +14,21 @@ export class ProductsService {
   ) {}
 
   async findAll(): Promise<Product[]> {
-    return this.productRepository.find({
-      take: 10,
-      select: ['id', 'name', 'code', 'amount', 'type'],
-      relations: {
-        priceHistory: true,
-      },
-    });
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .take(10)
+      .select([
+        'product.id',
+        'product.name',
+        'product.type',
+        'product.code',
+        'product.amount',
+        'priceHistory.date',
+        'priceHistory.value',
+      ])
+      .leftJoin('product.priceHistory', 'priceHistory')
+      .getMany();
+    return products.map((product) => Product.fromJSON(product));
   }
 
   async findOne(id: number): Promise<Product> {
