@@ -16,6 +16,10 @@ export class ProductsService {
   async findAll(): Promise<Product[]> {
     return this.productRepository.find({
       take: 10,
+      select: ['id', 'name', 'code', 'amount', 'type'],
+      relations: {
+        priceHistory: true,
+      },
     });
   }
 
