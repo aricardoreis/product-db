@@ -87,7 +87,7 @@ export class SalesService {
 
     this.logger.log(`Products created: ${invoiceData.products.length}`);
 
-    return `Invoice ${invoiceData.sale.id} has been saved with success!`;
+    return invoiceData.sale.id;
   }
 
   private async fetchInvoiceData(url: string): Promise<any> {
