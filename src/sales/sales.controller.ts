@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { Sale } from './entity/sale.entity';
-import { InvoiceData } from './dto/invoice-data.dto';
 import { CreateSaleDto } from './dto/create-sale-dto';
 import { SaleDetails } from './dto/sale-details.dto';
 
@@ -20,7 +19,7 @@ export class SalesController {
   }
 
   @Post()
-  async create(@Body() createSaleDto: CreateSaleDto): Promise<InvoiceData> {
+  async create(@Body() createSaleDto: CreateSaleDto): Promise<string> {
     return this.salesService.create(createSaleDto.url);
   }
 }

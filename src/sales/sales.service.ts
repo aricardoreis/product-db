@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
 import { StoresService } from '../stores/stores.service';
-import { InvoiceData } from './dto/invoice-data.dto';
 import { Sale } from './entity/sale.entity';
 import { InvoiceService } from './invoice.service';
 import { SaleDetails } from './dto/sale-details.dto';
@@ -51,7 +50,7 @@ export class SalesService {
     return sales.map((sale) => Sale.fromJSON(sale));
   }
 
-  async create(url: string): Promise<InvoiceData> {
+  async create(url: string): Promise<string> {
     this.logger.log('Loading invoice data...');
     const invoiceData = await this.invoiceService.fetchData(url);
 
@@ -88,7 +87,7 @@ export class SalesService {
 
     this.logger.log(`Products created: ${invoiceData.products.length}`);
 
-    return invoiceData;
+    return `Invoice ${invoiceData.sale.id} has been saved with success!`;
   }
 
   private async fetchInvoiceData(url: string): Promise<any> {
