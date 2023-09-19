@@ -89,8 +89,4 @@ export class SalesService {
 
     return invoiceData.sale.id;
   }
-
-  private async fetchInvoiceData(url: string): Promise<any> {
-    return this.invoiceService.fetchData(url);
-  }
 }
