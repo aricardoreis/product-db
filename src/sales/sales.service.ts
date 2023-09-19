@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
@@ -10,6 +10,8 @@ import { SaleDetails } from './dto/sale-details.dto';
 
 @Injectable()
 export class SalesService {
+  private readonly logger = new Logger(SalesService.name);
+
   constructor(
     @InjectRepository(Sale) private saleRepository: Repository<Sale>,
     private readonly invoiceService: InvoiceService,
@@ -44,12 +46,16 @@ export class SalesService {
   async findAll(): Promise<Sale[]> {
     const sales = await this.saleRepository.find({
       take: 10,
+      order: { date: 'DESC' },
     });
     return sales.map((sale) => Sale.fromJSON(sale));
   }
 
   async create(url: string): Promise<InvoiceData> {
+    this.logger.log('Loading invoice data...');
     const invoiceData = await this.invoiceService.fetchData(url);
+
+    this.logger.log(`Invoice data loaded: ${JSON.stringify(invoiceData)}`);
 
     // check if sale exists
     const sale = await this.saleRepository.findOne({
@@ -57,11 +63,17 @@ export class SalesService {
     });
 
     if (sale) {
+      this.logger.warn('Sale already exists');
       throw new Error('Sale already exists');
     }
 
     const store = await this.storesService.create(invoiceData.store);
+
+    this.logger.log(`Store created/updated: ${store.name}`);
+
     await this.saleRepository.save({ ...invoiceData.sale, store: store });
+
+    this.logger.log(`Sale created with id: ${invoiceData.sale.id}`);
 
     // create products
     await Promise.all(
@@ -73,6 +85,8 @@ export class SalesService {
           }),
       ),
     );
+
+    this.logger.log(`Products created: ${invoiceData.products.length}`);
 
     return invoiceData;
   }
