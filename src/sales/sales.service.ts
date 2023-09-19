@@ -41,10 +41,11 @@ export class SalesService {
     return SaleDetails.fromJSON(sale);
   }
 
-  findAll(): Promise<Sale[]> {
-    return this.saleRepository.find({
+  async findAll(): Promise<Sale[]> {
+    const sales = await this.saleRepository.find({
       take: 10,
     });
+    return sales.map((sale) => Sale.fromJSON(sale));
   }
 
   async create(url: string): Promise<InvoiceData> {

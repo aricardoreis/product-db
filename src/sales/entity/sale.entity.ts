@@ -28,4 +28,14 @@ export class Sale {
 
   @OneToMany(() => PriceHistory, (priceHistory) => priceHistory.sale)
   priceHistory: PriceHistory[];
+
+  static fromJSON(data: any): Sale {
+    return {
+      id: data.id,
+      date: data.date,
+      total: parseFloat(data.total),
+      store: undefined,
+      priceHistory: undefined,
+    };
+  }
 }
