@@ -14,7 +14,7 @@ export class Product {
   @Column()
   code: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 3 })
   amount: number;
 
   @Column()

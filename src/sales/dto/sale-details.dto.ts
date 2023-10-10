@@ -30,7 +30,7 @@ class ProductDetails {
       name: data.product.name,
       value: parseFloat(data.value),
       code: data.product.code,
-      amount: data.product.amount,
+      amount: parseFloat(data.product.amount),
       type: data.product.type,
     };
   }
