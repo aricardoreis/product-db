@@ -31,7 +31,7 @@ export class Product {
       id: data.id,
       name: data.name,
       code: data.code,
-      amount: data.amount,
+      amount: parseFloat(data.amount),
       type: data.type,
       isEan: undefined,
       priceHistory: data.priceHistory.map((priceHistory) =>
