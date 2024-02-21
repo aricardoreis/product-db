@@ -70,7 +70,11 @@ export class SalesService {
 
     this.logger.log(`Store created/updated: ${store.name}`);
 
-    await this.saleRepository.save({ ...invoiceData.sale, store: store });
+    await this.saleRepository.save({
+      ...invoiceData.sale,
+      store: store,
+      invoiceUrl: url,
+    });
 
     this.logger.log(`Sale created with id: ${invoiceData.sale.id}`);
 
