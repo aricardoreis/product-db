@@ -6,6 +6,7 @@ import { StoresService } from '../stores/stores.service';
 import { Sale } from './entity/sale.entity';
 import { InvoiceService } from './invoice.service';
 import { SaleDetails } from './dto/sale-details.dto';
+import { PaginationOptions } from 'src/paginate';
 
 @Injectable()
 export class SalesService {
@@ -42,12 +43,14 @@ export class SalesService {
     return SaleDetails.fromJSON(sale);
   }
 
-  async findAll(): Promise<Sale[]> {
-    const sales = await this.saleRepository.find({
-      take: 10,
+  async findAll(options: PaginationOptions): Promise<Sale[]> {
+    const [data, total] = await this.saleRepository.findAndCount({
+      take: options.limit,
+      skip: (options.page - 1) * options.limit,
       order: { date: 'DESC' },
     });
-    return sales.map((sale) => Sale.fromJSON(sale));
+    this.logger.log(`Found ${total} sales. Got ${data.length} items.`);
+    return data.map((sale) => Sale.fromJSON(sale));
   }
 
   async create(url: string): Promise<string> {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { Sale } from './entity/sale.entity';
 import { CreateSaleDto } from './dto/create-sale-dto';
@@ -9,8 +9,8 @@ export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Get()
-  async findAll(): Promise<Sale[]> {
-    return this.salesService.findAll();
+  async findAll(@Query() { limit, page }): Promise<Sale[]> {
+    return this.salesService.findAll({ limit, page });
   }
 
   @Get('/:id')
