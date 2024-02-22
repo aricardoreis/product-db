@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
@@ -6,7 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SalesModule } from './sales/sales.module';
 import { StoresModule } from './stores/stores.module';
-import { PagerMiddleware } from './middleware/pager.middleware';
 
 @Module({
   imports: [
@@ -27,10 +26,4 @@ import { PagerMiddleware } from './middleware/pager.middleware';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(PagerMiddleware)
-      .forRoutes({ path: 'sales', method: RequestMethod.GET });
-  }
-}
+export class AppModule {}

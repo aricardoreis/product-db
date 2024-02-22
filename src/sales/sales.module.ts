@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { SalesController } from './sales.controller';
 import { InvoiceService } from './invoice.service';
@@ -8,6 +8,7 @@ import { StoresModule } from '../stores/stores.module';
 import { ProductsModule } from '../products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sale } from './entity/sale.entity';
+import { PagerMiddleware } from '../middleware/pager.middleware';
 
 @Module({
   imports: [
@@ -20,4 +21,10 @@ import { Sale } from './entity/sale.entity';
   providers: [SalesService, InvoiceService],
   controllers: [SalesController],
 })
-export class SalesModule {}
+export class SalesModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(PagerMiddleware)
+      .forRoutes({ path: 'sales', method: RequestMethod.GET });
+  }
+}
