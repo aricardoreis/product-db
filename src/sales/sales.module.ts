@@ -25,6 +25,6 @@ export class SalesModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(PagerMiddleware)
-      .forRoutes({ path: 'sales', method: RequestMethod.GET });
+      .forRoutes({ path: '*', method: RequestMethod.GET });
   }
 }
