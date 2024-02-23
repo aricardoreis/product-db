@@ -49,7 +49,9 @@ export class SalesService {
       skip: (options.page - 1) * options.limit,
       order: { date: 'DESC' },
     });
+
     this.logger.log(`Found ${total} sales. Got ${data.length} items.`);
+
     return data.map((sale) => Sale.fromJSON(sale));
   }
 

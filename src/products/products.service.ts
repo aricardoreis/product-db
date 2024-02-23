@@ -1,22 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PriceHistory } from './entities/price-history.entity';
+import { PaginationOptions } from 'src/paginate';
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(PriceHistory)
     private priceHistoryRepository: Repository<PriceHistory>,
   ) {}
 
-  async findAll(): Promise<Product[]> {
-    const products = await this.productRepository
+  async findOne(id: number): Promise<Product> {
+    return this.productRepository.findOne({
+      where: { id },
+      relations: {
+        priceHistory: true,
+      },
+    });
+  }
+
+  async findAll(options: PaginationOptions): Promise<Product[]> {
+    const [products, total] = await this.productRepository
       .createQueryBuilder('product')
-      .take(10)
+      .take(options.limit)
+      .skip((options.page - 1) * options.limit)
       .select([
         'product.id',
         'product.name',
@@ -27,17 +40,11 @@ export class ProductsService {
         'priceHistory.value',
       ])
       .leftJoin('product.priceHistory', 'priceHistory')
-      .getMany();
-    return products.map((product) => Product.fromJSON(product));
-  }
+      .getManyAndCount();
 
-  async findOne(id: number): Promise<Product> {
-    return this.productRepository.findOne({
-      where: { id },
-      relations: {
-        priceHistory: true,
-      },
-    });
+    this.logger.log(`Found ${total} products. Got ${products.length} items.`);
+
+    return products.map((product) => Product.fromJSON(product));
   }
 
   async findByCode(code: string): Promise<Product> {
