@@ -8,7 +8,6 @@ import {
   Query,
   RequestMethod,
 } from '@nestjs/common';
-import { AppModule } from '../app.module';
 import { PagerMiddleware } from './pager.middleware';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -27,7 +26,6 @@ class TestController {
 }
 
 @Module({
-  imports: [AppModule],
   controllers: [TestController],
 })
 class TestModule {
