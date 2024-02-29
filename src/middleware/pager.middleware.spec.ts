@@ -8,9 +8,9 @@ import {
   Query,
   RequestMethod,
 } from '@nestjs/common';
-import { PagerMiddleware } from './pager.middleware';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
+import { PagerMiddleware } from './pager.middleware';
 
 @Controller('test')
 class TestController {

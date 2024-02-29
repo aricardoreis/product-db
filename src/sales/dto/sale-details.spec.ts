@@ -69,8 +69,5 @@ describe('InvoiceData', () => {
     expect(data.store.name).toEqual(saleDetails.store.name);
     expect(data.date).toEqual(saleDetails.date);
     expect(data.products.length).toEqual(saleDetails.priceHistory.length);
-    // data.products.forEach((product, index) => {
-    //   expect(product).toEqual(invoiceData.products[index]);
-    // });
   });
 });
