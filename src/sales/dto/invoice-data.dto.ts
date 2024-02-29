@@ -32,7 +32,6 @@ class SaleData {
   date: string;
 
   static fromJSON(data: any): SaleData {
-    console.log(`invoiceData: ${data.date}`);
     return {
       id: data.id,
       total: data.total,
