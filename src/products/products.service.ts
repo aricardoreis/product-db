@@ -70,6 +70,7 @@ export class ProductsService {
         sale_id: product.saleId,
       };
       await this.priceHistoryRepository.save(newPriceHistory);
+      result = existingProduct;
     } else {
       // create new product on database
       const newProduct: Product = {
