@@ -4,7 +4,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PriceHistory } from './entities/price-history.entity';
-import { PaginationOptions } from 'src/paginate';
+import { PaginationAndFilterOptions } from 'src/paginate';
 
 @Injectable()
 export class ProductsService {
@@ -25,9 +25,14 @@ export class ProductsService {
     });
   }
 
-  async findAll(options: PaginationOptions): Promise<[Product[], number]> {
+  async findAll(
+    options: PaginationAndFilterOptions,
+  ): Promise<[Product[], number]> {
     const [products, total] = await this.productRepository
       .createQueryBuilder('product')
+      .where('product.name ILIKE :keyword', {
+        keyword: `%${options.keyword}%`,
+      })
       .take(options.limit)
       .skip((options.page - 1) * options.limit)
       .select([

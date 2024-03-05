@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaginationOptions } from 'src/paginate';
+import { PaginationAndFilterOptions } from 'src/paginate';
 import { serviceMock } from './../../test/mocks';
 import { Product } from './entities/product.entity';
 import { ProductsController } from './products.controller';
@@ -47,9 +47,10 @@ describe('ProductsController', () => {
     const list: Product[] = [product, product];
     serviceMock.findAll.mockReturnValue(list);
 
-    const options: PaginationOptions = {
+    const options: PaginationAndFilterOptions = {
       limit: 10,
       page: 1,
+      keyword: 'abcde',
     };
     const result = await controller.findAll(options);
 

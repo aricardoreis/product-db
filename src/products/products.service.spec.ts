@@ -84,6 +84,7 @@ describe('ProductsService', () => {
       leftJoin: () => createQueryBuilder,
       take: () => createQueryBuilder,
       skip: () => createQueryBuilder,
+      where: () => createQueryBuilder,
       getManyAndCount: () => {
         return [products, totalProducts];
       },

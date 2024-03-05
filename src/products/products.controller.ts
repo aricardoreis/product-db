@@ -7,10 +7,13 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async findAll(@Query() { limit, page }): Promise<[Product[], number]> {
+  async findAll(
+    @Query() { limit, page, keyword = '' },
+  ): Promise<[Product[], number]> {
     return this.productsService.findAll({
       limit,
       page,
+      keyword,
     });
   }
 
