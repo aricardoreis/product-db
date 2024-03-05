@@ -16,9 +16,23 @@ export class TransformInterceptor<T>
   implements NestInterceptor<T, Response<T>>
 {
   intercept(
-    context: ExecutionContext,
+    _context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
-    return next.handle().pipe(map((data) => ({ success: true, result: data })));
+    return next.handle().pipe(
+      map((data) => {
+        if (Array.isArray(data)) {
+          return {
+            success: true,
+            result: data[0],
+            total: data[1],
+          };
+        }
+        return {
+          success: true,
+          result: data,
+        };
+      }),
+    );
   }
 }
