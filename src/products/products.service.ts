@@ -35,6 +35,7 @@ export class ProductsService {
       })
       .take(options.limit)
       .skip((options.page - 1) * options.limit)
+      .orderBy('product.name', 'ASC')
       .select([
         'product.id',
         'product.name',
