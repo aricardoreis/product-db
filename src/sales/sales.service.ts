@@ -43,7 +43,7 @@ export class SalesService {
     return SaleDetails.fromJSON(sale);
   }
 
-  async findAll(options: PaginationOptions): Promise<Sale[]> {
+  async findAll(options: PaginationOptions): Promise<[Sale[], number]> {
     const [data, total] = await this.saleRepository.findAndCount({
       take: options.limit,
       skip: (options.page - 1) * options.limit,
@@ -52,7 +52,7 @@ export class SalesService {
 
     this.logger.log(`Found ${total} sales. Got ${data.length} items.`);
 
-    return data.map((sale) => Sale.fromJSON(sale));
+    return [data.map((sale) => Sale.fromJSON(sale)), total];
   }
 
   async create(url: string): Promise<string> {

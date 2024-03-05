@@ -61,6 +61,7 @@ describe('ProductsService', () => {
   });
 
   it('should retrieve items', async () => {
+    const totalProducts = 123;
     const products = [
       {
         id: 1234,
@@ -84,7 +85,7 @@ describe('ProductsService', () => {
       take: () => createQueryBuilder,
       skip: () => createQueryBuilder,
       getManyAndCount: () => {
-        return [products, products.length];
+        return [products, totalProducts];
       },
     };
     repositoryMock.createQueryBuilder.mockReturnValue(createQueryBuilder);
@@ -93,9 +94,10 @@ describe('ProductsService', () => {
       limit: 5,
       page: 1,
     };
-    const items = await service.findAll(paginationOptions);
+    const [items, total] = await service.findAll(paginationOptions);
 
     expect(items.length).toEqual(products.length);
+    expect(total).toEqual(totalProducts);
   });
 
   it('should find a product by code', async () => {

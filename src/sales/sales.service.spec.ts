@@ -83,6 +83,7 @@ describe('SalesService', () => {
   });
 
   it('should retrieve items', async () => {
+    const totalItems = 123;
     const sales = [
       {
         id: '1',
@@ -96,15 +97,16 @@ describe('SalesService', () => {
         },
       },
     ];
-    repositoryMock.findAndCount.mockReturnValue([sales, 0]);
+    repositoryMock.findAndCount.mockReturnValue([sales, totalItems]);
 
     const paginationOptions = {
       limit: 5,
       page: 1,
     };
-    const items = await service.findAll(paginationOptions);
+    const [items, total] = await service.findAll(paginationOptions);
 
     expect(items.length).toEqual(sales.length);
+    expect(total).toEqual(totalItems);
 
     expect(repositoryMock.findAndCount).toHaveBeenCalledWith({
       take: paginationOptions.limit,

@@ -5,6 +5,8 @@ import * as request from 'supertest';
 import { TransformInterceptor } from './transform-interceptor';
 
 const RETURN_VALUE = 'test';
+const RETURN_NUMBER = 123;
+
 const interceptor = new TransformInterceptor();
 
 @Controller('test')
@@ -15,8 +17,16 @@ class TestController {
   }
 }
 
+@Controller('array')
+class TestWithArrayController {
+  @Get()
+  get() {
+    return [RETURN_VALUE, RETURN_NUMBER];
+  }
+}
+
 @Module({
-  controllers: [TestController],
+  controllers: [TestController, TestWithArrayController],
 })
 class TestModule {}
 
@@ -39,13 +49,21 @@ describe('TransformInterceptor', () => {
     await app.init();
   });
 
-  it(`should be defined`, () => {
+  it('should be defined', () => {
     expect(interceptor).toBeDefined();
   });
 
-  it(`should transform response`, async () => {
+  it('should transform response when data is not an array', async () => {
     await request(app.getHttpServer())
       .get('/test')
       .expect(200, { success: true, result: RETURN_VALUE });
+  });
+
+  it('should transform response when data is an array', async () => {
+    await request(app.getHttpServer()).get('/array').expect(200, {
+      success: true,
+      result: RETURN_VALUE,
+      total: RETURN_NUMBER,
+    });
   });
 });

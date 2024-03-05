@@ -25,7 +25,7 @@ export class ProductsService {
     });
   }
 
-  async findAll(options: PaginationOptions): Promise<Product[]> {
+  async findAll(options: PaginationOptions): Promise<[Product[], number]> {
     const [products, total] = await this.productRepository
       .createQueryBuilder('product')
       .take(options.limit)
@@ -44,7 +44,7 @@ export class ProductsService {
 
     this.logger.log(`Found ${total} products. Got ${products.length} items.`);
 
-    return products.map((product) => Product.fromJSON(product));
+    return [products.map((product) => Product.fromJSON(product)), total];
   }
 
   async findByCode(code: string): Promise<Product> {

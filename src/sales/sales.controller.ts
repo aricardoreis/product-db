@@ -9,7 +9,7 @@ export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Get()
-  async findAll(@Query() { limit, page }): Promise<Sale[]> {
+  async findAll(@Query() { limit, page }): Promise<[Sale[], number]> {
     return this.salesService.findAll({ limit, page });
   }
 
