@@ -9,6 +9,22 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { PriceHistory } from './entities/price-history.entity';
 import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
+import { UpdateProductDto } from './dto/update-product.dto';
+
+const product = {
+  id: 1234,
+  name: 'Test Product',
+  type: 'Un',
+  code: '1234657890',
+  amount: 1,
+  priceHistory: [
+    {
+      id: 1,
+      date: new Date(),
+      value: 1.99,
+    },
+  ],
+};
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -40,21 +56,6 @@ describe('ProductsService', () => {
   });
 
   it('should find a product', async () => {
-    const product = {
-      id: 1234,
-      name: 'Test Product',
-      type: 'Un',
-      code: '1234657890',
-      amount: 1,
-      priceHistory: [
-        {
-          id: 1,
-          date: new Date(),
-          value: 1.99,
-        },
-      ],
-    };
-
     repositoryMock.findOne.mockReturnValue(product);
 
     await expect(service.findOne(product.id)).resolves.toEqual(product);
@@ -62,22 +63,7 @@ describe('ProductsService', () => {
 
   it('should retrieve items', async () => {
     const totalProducts = 123;
-    const products = [
-      {
-        id: 1234,
-        name: 'Test Product',
-        type: 'Un',
-        code: '1234657890',
-        amount: 1,
-        priceHistory: [
-          {
-            id: 1,
-            date: new Date(),
-            value: 1.99,
-          },
-        ],
-      },
-    ];
+    const products = [product];
 
     const createQueryBuilder: any = {
       select: () => createQueryBuilder,
@@ -103,21 +89,6 @@ describe('ProductsService', () => {
   });
 
   it('should find a product by code', async () => {
-    const product = {
-      id: 1234,
-      name: 'Test Product',
-      type: 'Un',
-      code: '1234657890',
-      amount: 1,
-      priceHistory: [
-        {
-          id: 1,
-          date: new Date(),
-          value: 1.99,
-        },
-      ],
-    };
-
     repositoryMock.findOne.mockReturnValue(product);
 
     await expect(service.findByCode(product.code)).resolves.toEqual(product);
@@ -196,6 +167,43 @@ describe('ProductsService', () => {
     };
 
     await createOrUpdateProduct(existingProduct, product, 1, 1);
+  });
+
+  it('should update one product by id (product exists)', async () => {
+    const dto: UpdateProductDto = {
+      name: 'Updated name',
+    };
+
+    repositoryMock.findOne.mockReturnValueOnce(product);
+    repositoryMock.save.mockReturnValue(product);
+
+    await service.update(product.id, dto);
+
+    expect(repositoryMock.findOne).toHaveBeenCalledWith({
+      where: { id: product.id },
+    });
+    expect(repositoryMock.save).toHaveBeenCalledWith({
+      ...product,
+      ...dto,
+    });
+  });
+
+  it('should update one product by id (product does not exists)', async () => {
+    const dto: UpdateProductDto = {
+      name: 'Updated name',
+    };
+
+    repositoryMock.findOne.mockReturnValueOnce(null);
+    repositoryMock.save.mockReturnValue(product);
+
+    await expect(service.update(product.id, dto)).rejects.toThrow(
+      `Product ${product.id} not found`,
+    );
+
+    expect(repositoryMock.findOne).toHaveBeenCalledWith({
+      where: { id: product.id },
+    });
+    expect(repositoryMock.save).not.toHaveBeenCalled();
   });
 
   const createOrUpdateProduct = async (

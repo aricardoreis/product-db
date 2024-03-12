@@ -4,6 +4,7 @@ import { serviceMock } from './../../test/mocks';
 import { Product } from './entities/product.entity';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 const product: Product = {
   id: 1234567890,
@@ -56,5 +57,17 @@ describe('ProductsController', () => {
 
     expect(result.length).toEqual(list.length);
     expect(serviceMock.findAll).toHaveBeenCalledWith(options);
+  });
+
+  it('should update one product by id', async () => {
+    serviceMock.update.mockReturnValue(product);
+
+    const updatedProduct: UpdateProductDto = {
+      name: 'Updated Product',
+    };
+
+    await controller.update(product.id.toString(), updatedProduct);
+
+    expect(serviceMock.update).toHaveBeenCalledWith(product.id, updatedProduct);
   });
 });

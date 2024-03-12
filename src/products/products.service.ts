@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PriceHistory } from './entities/price-history.entity';
 import { PaginationAndFilterOptions } from 'src/paginate';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -98,6 +99,20 @@ export class ProductsService {
     }
 
     return result;
+  }
+
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.productRepository.findOne({
+      where: { id },
+    });
+    if (!product) {
+      throw new Error(`Product ${id} not found`);
+    }
+
+    return this.productRepository.save({
+      ...product,
+      ...updateProductDto,
+    });
   }
 
   private hasEANCode(product: CreateProductDto): boolean {
