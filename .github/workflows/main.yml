@@ -47,9 +47,9 @@ jobs:
         username: ${{ secrets.RASPI_USERNAME }}
         password: ${{ secrets.RASPI_PASSWORD }}
         port: 22
-        source: "dist/*"
-        target: "Documents/code/product-db/dist"
-        rm: true
+        source: "dist/**"
+        target: "Documents/code/product-db"
+        overwrite: true
 
     - name: Reload application on target host
       uses: appleboy/ssh-action@v1.0.3
