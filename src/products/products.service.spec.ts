@@ -10,6 +10,7 @@ import { PriceHistory } from './entities/price-history.entity';
 import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SortingParam } from 'src/decorators/sorting-params.decorator';
 
 const product = {
   id: 1234,
@@ -82,7 +83,11 @@ describe('ProductsService', () => {
       limit: 5,
       page: 1,
     };
-    const [items, total] = await service.findAll(paginationOptions);
+    const sort: SortingParam = {
+      field: 'id',
+      order: 'desc',
+    };
+    const [items, total] = await service.findAll(paginationOptions, sort);
 
     expect(items.length).toEqual(products.length);
     expect(total).toEqual(totalProducts);
