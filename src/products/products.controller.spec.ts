@@ -5,6 +5,7 @@ import { Product } from './entities/product.entity';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SortingParam } from 'src/decorators/sorting-params.decorator';
 
 const product: Product = {
   id: 1234567890,
@@ -53,10 +54,14 @@ describe('ProductsController', () => {
       page: 1,
       keyword: 'abcde',
     };
-    const result = await controller.findAll(options);
+    const sort: SortingParam = {
+      field: 'name',
+      order: 'asc',
+    };
+    const result = await controller.findAll(options, sort);
 
     expect(result.length).toEqual(list.length);
-    expect(serviceMock.findAll).toHaveBeenCalledWith(options);
+    expect(serviceMock.findAll).toHaveBeenCalledWith(options, sort);
   });
 
   it('should update one product by id', async () => {

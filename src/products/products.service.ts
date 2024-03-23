@@ -6,6 +6,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { PriceHistory } from './entities/price-history.entity';
 import { PaginationAndFilterOptions } from 'src/paginate';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SortingParam } from 'src/decorators/sorting-params.decorator';
 
 @Injectable()
 export class ProductsService {
@@ -28,15 +29,15 @@ export class ProductsService {
 
   async findAll(
     options: PaginationAndFilterOptions,
+    sort?: SortingParam,
   ): Promise<[Product[], number]> {
-    const [products, total] = await this.productRepository
+    let query = this.productRepository
       .createQueryBuilder('product')
       .where('product.name ILIKE :keyword', {
         keyword: `%${options.keyword}%`,
       })
       .take(options.limit)
       .skip((options.page - 1) * options.limit)
-      .orderBy('product.name', 'ASC')
       .select([
         'product.id',
         'product.name',
@@ -46,8 +47,19 @@ export class ProductsService {
         'priceHistory.date',
         'priceHistory.value',
       ])
-      .leftJoin('product.priceHistory', 'priceHistory')
-      .getManyAndCount();
+      .leftJoin('product.priceHistory', 'priceHistory');
+
+    if (sort) {
+      query = query.orderBy(
+        `product.${sort.field}`,
+        sort.order === 'asc' ? 'ASC' : 'DESC',
+      );
+    } else {
+      // default sorting
+      query = query.orderBy('product.name', 'ASC');
+    }
+
+    const [products, total] = await query.getManyAndCount();
 
     this.logger.log(`Found ${total} products. Got ${products.length} items.`);
 
