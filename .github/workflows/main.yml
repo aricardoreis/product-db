@@ -35,7 +35,7 @@ jobs:
         cache: 'npm'
     - run: npm i
     - run: npm run build
-    - run: npm test
+    - run: npm run test:cov
 
     - name: List files after build
       run: ls -la dist
@@ -47,8 +47,8 @@ jobs:
         username: ${{ secrets.RASPI_USERNAME }}
         password: ${{ secrets.RASPI_PASSWORD }}
         port: 22
-        source: "dist/**"
-        target: "Documents/code/product-db"
+        source: "dist/*"
+        target: "Documents/code/product-db/dist"
         rm: true
 
     - name: Reload application on target host
