@@ -1,0 +1,63 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Build and deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  PM2_PATH: ${{ secrets.PM2_PATH }}
+  PRODUCT_DB_URL: ${{ secrets.PRODUCT_DB_URL }}
+  DB_TYPE: ${{ secrets.DB_TYPE }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+
+    - name: List files after build
+      run: ls -la dist
+
+    - name: Copy dist files to target host via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.RASPI_HOST }}
+        username: ${{ secrets.RASPI_USERNAME }}
+        password: ${{ secrets.RASPI_PASSWORD }}
+        port: 22
+        source: "dist/**"
+        target: "Documents/code/product-db"
+        rm: true
+
+    - name: Reload application on target host
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.RASPI_HOST }}
+        username: ${{ secrets.RASPI_USERNAME }}
+        password: ${{ secrets.RASPI_PASSWORD }}
+        port: 22
+        script: |
+          ${{ env.PM2_PATH }} status
+          ${{ env.PM2_PATH }} reload product-db-server-nest
