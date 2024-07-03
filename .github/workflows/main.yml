@@ -16,6 +16,9 @@ env:
   DB_USER: ${{ secrets.DB_USER }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_NAME: ${{ secrets.DB_NAME }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+  SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
 
 jobs:
   build:
