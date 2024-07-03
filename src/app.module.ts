@@ -8,7 +8,6 @@ import { SalesModule } from './sales/sales.module';
 import { StoresModule } from './stores/stores.module';
 import { PagerMiddleware } from './middleware/pager.middleware';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { SupabaseModule } from './shared/supabase/supabase.module';
 import { SupabaseGuard } from './shared/supabase/supabase.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -29,7 +28,6 @@ import { APP_GUARD } from '@nestjs/core';
     SalesModule,
     StoresModule,
     AuthModule,
-    UsersModule,
     SupabaseModule,
   ],
   controllers: [AppController],
