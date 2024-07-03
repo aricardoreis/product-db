@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -6,8 +14,10 @@ import {
   SortingParam,
   SortingParams,
 } from '../decorators/sorting-params.decorator';
+import { TransformInterceptor } from 'src/shared/transform-interceptor';
 
 @Controller('products')
+@UseInterceptors(TransformInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 

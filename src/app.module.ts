@@ -7,6 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SalesModule } from './sales/sales.module';
 import { StoresModule } from './stores/stores.module';
 import { PagerMiddleware } from './middleware/pager.middleware';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { SupabaseModule } from './shared/supabase/supabase.module';
+import { SupabaseGuard } from './shared/supabase/supabase.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -23,9 +28,18 @@ import { PagerMiddleware } from './middleware/pager.middleware';
     }),
     SalesModule,
     StoresModule,
+    AuthModule,
+    UsersModule,
+    SupabaseModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: SupabaseGuard,
+    },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

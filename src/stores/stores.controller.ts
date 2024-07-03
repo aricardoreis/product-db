@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { Store } from './entities/store.entity';
 import { CreateStoreDto } from './dto/create-store.dto';
+import { TransformInterceptor } from 'src/shared/transform-interceptor';
 
 @Controller('stores')
+@UseInterceptors(TransformInterceptor)
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
