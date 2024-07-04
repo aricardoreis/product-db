@@ -83,7 +83,8 @@
       "index.ts",
       "dto.ts",
       "entity.ts",
-      "src/users/"
+      "src/users/",
+      "src/shared/supabase"
     ],
     "coverageDirectory": "../coverage",
     "coverageThreshold": {
