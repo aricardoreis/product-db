@@ -9,7 +9,7 @@ import {
 import { StoresService } from './stores.service';
 import { Store } from './entities/store.entity';
 import { CreateStoreDto } from './dto/create-store.dto';
-import { TransformInterceptor } from 'src/shared/transform-interceptor';
+import { TransformInterceptor } from '../shared/transform-interceptor';
 
 @Controller('stores')
 @UseInterceptors(TransformInterceptor)

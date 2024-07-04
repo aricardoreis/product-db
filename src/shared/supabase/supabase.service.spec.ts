@@ -9,7 +9,7 @@ describe('SupabaseService', () => {
       providers: [SupabaseService],
     }).compile();
 
-    service = module.get<SupabaseService>(SupabaseService);
+    service = await module.resolve<SupabaseService>(SupabaseService);
   });
 
   it('should be defined', () => {

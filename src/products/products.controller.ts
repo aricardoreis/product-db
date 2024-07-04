@@ -14,7 +14,7 @@ import {
   SortingParam,
   SortingParams,
 } from '../decorators/sorting-params.decorator';
-import { TransformInterceptor } from 'src/shared/transform-interceptor';
+import { TransformInterceptor } from '../shared/transform-interceptor';
 
 @Controller('products')
 @UseInterceptors(TransformInterceptor)
