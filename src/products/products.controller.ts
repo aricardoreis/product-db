@@ -15,12 +15,14 @@ import {
   SortingParams,
 } from '../decorators/sorting-params.decorator';
 import { TransformInterceptor } from '../shared/transform-interceptor';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('products')
 @UseInterceptors(TransformInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Public()
   @Get()
   async findAll(
     @Query() { limit, page, keyword = '' },
@@ -37,6 +39,7 @@ export class ProductsController {
     );
   }
 
+  @Public()
   @Get('/:id')
   async findOne(@Param('id') id: number): Promise<Product> {
     return this.productsService.findOne(id);

@@ -12,17 +12,20 @@ import { Sale } from './entity/sale.entity';
 import { CreateSaleDto } from './dto/create-sale-dto';
 import { SaleDetails } from './dto/sale-details.dto';
 import { TransformInterceptor } from '../shared/transform-interceptor';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('sales')
 @UseInterceptors(TransformInterceptor)
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
+  @Public()
   @Get()
   async findAll(@Query() { limit, page }): Promise<[Sale[], number]> {
     return this.salesService.findAll({ limit, page });
   }
 
+  @Public()
   @Get('/:id')
   async findOne(@Param('id') id: string): Promise<SaleDetails> {
     return this.salesService.findOne(id);
