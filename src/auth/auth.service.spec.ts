@@ -39,6 +39,22 @@ describe('AuthService', () => {
     expect(access_token).toEqual(token);
   });
 
+  it('should return new access token when refreshing token', async () => {
+    const token = '132456789';
+    const authTokenResponseData = {
+      data: { session: { access_token: token } },
+    };
+
+    supabaseServiceMock.getClient.mockReturnValue({
+      auth: {
+        refreshSession: jest.fn().mockResolvedValue(authTokenResponseData),
+      },
+    });
+
+    const { access_token } = await service.refreshSession('refresh_token');
+    expect(access_token).toEqual(token);
+  });
+
   it('should throw UnauthorizedException when credentials do not match', async () => {
     const authTokenResponseData = {
       error: { message: 'Invalid credentials' },

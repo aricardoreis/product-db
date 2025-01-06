@@ -19,4 +19,19 @@ export class AuthService {
 
     return { access_token, token_type, expires_in, expires_at, refresh_token };
   }
+
+  async refreshSession(refreshToken: string): Promise<any> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .auth.refreshSession({ refresh_token: refreshToken });
+
+    if (error) {
+      throw new UnauthorizedException();
+    }
+
+    const { access_token, expires_in, expires_at, refresh_token, token_type } =
+      data.session;
+
+    return { access_token, token_type, expires_in, expires_at, refresh_token };
+  }
 }
