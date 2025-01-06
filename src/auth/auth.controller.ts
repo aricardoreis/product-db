@@ -25,4 +25,11 @@ export class AuthController {
   signIn(@Body() signInDto: Record<string, any>) {
     return this.authService.signIn(signInDto.email, signInDto.password);
   }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  refreshSession(@Body() refreshSessionDto: Record<string, any>) {
+    return this.authService.refreshSession(refreshSessionDto.refreshToken);
+  }
 }
