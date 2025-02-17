@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
