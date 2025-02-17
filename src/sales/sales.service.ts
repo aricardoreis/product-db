@@ -56,46 +56,52 @@ export class SalesService {
   }
 
   async create(url: string): Promise<string> {
-    this.logger.log('Loading invoice data...');
-    const invoiceData = await this.invoiceService.fetchData(url);
+    this.logger.log('Loading invoice data', url);
 
-    this.logger.log(`Invoice data loaded: ${JSON.stringify(invoiceData)}`);
+    try {
+      const invoiceData = await this.invoiceService.fetchData(url);
 
-    // check if sale exists
-    const sale = await this.saleRepository.findOne({
-      where: { id: invoiceData.sale.id },
-    });
+      this.logger.log(`Invoice data loaded: ${JSON.stringify(invoiceData)}`);
 
-    if (sale) {
-      this.logger.warn('Sale already exists');
-      throw new Error('Sale already exists');
+      // check if sale exists
+      const sale = await this.saleRepository.findOne({
+        where: { id: invoiceData.sale.id },
+      });
+
+      if (sale) {
+        this.logger.warn('Sale already exists');
+        throw new Error('Sale already exists');
+      }
+
+      const store = await this.storesService.create(invoiceData.store);
+
+      this.logger.log(`Store created/updated: ${store.name}`);
+
+      await this.saleRepository.save({
+        ...invoiceData.sale,
+        store: store,
+        invoiceUrl: url,
+      });
+
+      this.logger.log(`Sale created with id: ${invoiceData.sale.id}`);
+
+      // create products
+      await Promise.all(
+        invoiceData.products.map(
+          async (product) =>
+            await this.productsService.create({
+              ...product,
+              saleId: invoiceData.sale.id,
+            }),
+        ),
+      );
+
+      this.logger.log(`Products created: ${invoiceData.products.length}`);
+
+      return invoiceData.sale.id;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
     }
-
-    const store = await this.storesService.create(invoiceData.store);
-
-    this.logger.log(`Store created/updated: ${store.name}`);
-
-    await this.saleRepository.save({
-      ...invoiceData.sale,
-      store: store,
-      invoiceUrl: url,
-    });
-
-    this.logger.log(`Sale created with id: ${invoiceData.sale.id}`);
-
-    // create products
-    await Promise.all(
-      invoiceData.products.map(
-        async (product) =>
-          await this.productsService.create({
-            ...product,
-            saleId: invoiceData.sale.id,
-          }),
-      ),
-    );
-
-    this.logger.log(`Products created: ${invoiceData.products.length}`);
-
-    return invoiceData.sale.id;
   }
 }
