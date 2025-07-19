@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
@@ -40,10 +40,20 @@ export class SalesService {
       .leftJoin('sale.store', 'store')
       .cache(true)
       .getOne();
+    
+    if (!sale) {
+      throw new NotFoundException(`Sale with id ${id} not found`);
+    }
+    
     return SaleDetails.fromJSON(sale);
   }
 
   async findAll(options: PaginationOptions): Promise<[Sale[], number]> {
+    // Validate pagination options
+    if (options.limit < 1 || options.page < 1) {
+      throw new BadRequestException('Invalid pagination parameters. Limit and page must be greater than 0.');
+    }
+
     const [data, total] = await this.saleRepository.findAndCount({
       take: options.limit,
       skip: (options.page - 1) * options.limit,
@@ -58,6 +68,11 @@ export class SalesService {
   async create(url: string): Promise<string> {
     this.logger.log('Loading invoice data', url);
 
+    // Validate URL
+    if (!url || typeof url !== 'string') {
+      throw new BadRequestException('Invalid URL provided');
+    }
+
     try {
       const invoiceData = await this.invoiceService.fetchData(url);
 
@@ -70,7 +85,7 @@ export class SalesService {
 
       if (sale) {
         this.logger.warn('Sale already exists');
-        throw new Error('Sale already exists');
+        throw new ConflictException('Sale already exists');
       }
 
       const store = await this.storesService.create(invoiceData.store);
@@ -101,7 +116,16 @@ export class SalesService {
       return invoiceData.sale.id;
     } catch (error) {
       this.logger.error(error);
-      throw error;
+      
+      // Re-throw HTTP exceptions as they are already properly formatted
+      if (error instanceof ConflictException || 
+          error instanceof BadRequestException ||
+          error.constructor.name === 'HttpException') {
+        throw error;
+      }
+      
+      // For unexpected errors, throw a generic server error
+      throw new BadRequestException('Failed to create sale: ' + error.message);
     }
   }
 }
