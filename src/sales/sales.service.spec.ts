@@ -82,6 +82,24 @@ describe('SalesService', () => {
     );
   });
 
+  it('should throw NotFoundException when sale is not found', async () => {
+    const saleId = 'non-existent-id';
+
+    const createQueryBuilder: any = {
+      where: () => createQueryBuilder,
+      select: () => createQueryBuilder,
+      leftJoin: () => createQueryBuilder,
+      cache: () => createQueryBuilder,
+      getOne: () => null, // Return null to simulate sale not found
+    };
+
+    repositoryMock.createQueryBuilder.mockReturnValue(createQueryBuilder);
+
+    await expect(service.findOne(saleId)).rejects.toThrow(
+      `Sale with id ${saleId} not found`,
+    );
+  });
+
   it('should retrieve items', async () => {
     const totalItems = 123;
     const sales = [
@@ -179,5 +197,16 @@ describe('SalesService', () => {
     repositoryMock.findOne.mockReturnValueOnce({ id: 'SALE_ID' });
 
     await expect(service.create('url')).rejects.toThrow('Sale already exists');
+  });
+
+  it('should throw BadRequestException for invalid URL', async () => {
+    // Test with null URL
+    await expect(service.create(null)).rejects.toThrow('Invalid URL provided');
+
+    // Test with empty string URL
+    await expect(service.create('')).rejects.toThrow('Invalid URL provided');
+
+    // Test with non-string URL
+    await expect(service.create(123 as any)).rejects.toThrow('Invalid URL provided');
   });
 });

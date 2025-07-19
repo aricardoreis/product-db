@@ -49,11 +49,6 @@ export class SalesService {
   }
 
   async findAll(options: PaginationOptions): Promise<[Sale[], number]> {
-    // Validate pagination options
-    if (options.limit < 1 || options.page < 1) {
-      throw new BadRequestException('Invalid pagination parameters. Limit and page must be greater than 0.');
-    }
-
     const [data, total] = await this.saleRepository.findAndCount({
       take: options.limit,
       skip: (options.page - 1) * options.limit,
