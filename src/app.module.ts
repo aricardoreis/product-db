@@ -33,10 +33,15 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: SupabaseGuard,
-    },
+    // Enable guard by default, disable only in development
+    ...(process.env.NODE_ENV !== 'development'
+      ? [
+          {
+            provide: APP_GUARD,
+            useClass: SupabaseGuard,
+          },
+        ]
+      : []),
   ],
 })
 export class AppModule {
