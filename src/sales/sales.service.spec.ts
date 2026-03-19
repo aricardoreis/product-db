@@ -207,6 +207,8 @@ describe('SalesService', () => {
     await expect(service.create('')).rejects.toThrow('Invalid URL provided');
 
     // Test with non-string URL
-    await expect(service.create(123 as any)).rejects.toThrow('Invalid URL provided');
+    await expect(service.create(123 as any)).rejects.toThrow(
+      'Invalid URL provided',
+    );
   });
 });

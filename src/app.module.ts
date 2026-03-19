@@ -11,10 +11,37 @@ import { AuthModule } from './auth/auth.module';
 import { SupabaseModule } from './shared/supabase/supabase.module';
 import { SupabaseGuard } from './shared/supabase/supabase.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+        transport: {
+          targets: [
+            {
+              target: 'pino-pretty',
+              options: {},
+              level: 'debug',
+            },
+            ...(process.env.AXIOM_TOKEN
+              ? [
+                  {
+                    target: '@axiomhq/pino',
+                    options: {
+                      dataset: process.env.AXIOM_DATASET || 'product-db-logs',
+                      token: process.env.AXIOM_TOKEN,
+                    },
+                    level: 'info' as const,
+                  },
+                ]
+              : []),
+          ],
+        },
+      },
+    }),
     ProductsModule,
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as any,
