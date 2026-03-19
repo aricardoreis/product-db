@@ -1,4 +1,10 @@
-import { Injectable, Logger, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductsService } from '../products/products.service';
@@ -40,11 +46,11 @@ export class SalesService {
       .leftJoin('sale.store', 'store')
       .cache(true)
       .getOne();
-    
+
     if (!sale) {
       throw new NotFoundException(`Sale with id ${id} not found`);
     }
-    
+
     return SaleDetails.fromJSON(sale);
   }
 
@@ -55,7 +61,9 @@ export class SalesService {
       order: { date: 'DESC' },
     });
 
-    this.logger.log(`Found ${total} sales. Got ${data.length} items.`);
+    this.logger.log(
+      `Found ${total} sales (page=${options.page}, limit=${options.limit})`,
+    );
 
     return [data.map((sale) => Sale.fromJSON(sale)), total];
   }
@@ -111,14 +119,16 @@ export class SalesService {
       return invoiceData.sale.id;
     } catch (error) {
       this.logger.error(error);
-      
+
       // Re-throw HTTP exceptions as they are already properly formatted
-      if (error instanceof ConflictException || 
-          error instanceof BadRequestException ||
-          error.constructor.name === 'HttpException') {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException ||
+        error.constructor.name === 'HttpException'
+      ) {
         throw error;
       }
-      
+
       // For unexpected errors, throw a generic server error
       throw new BadRequestException('Failed to create sale: ' + error.message);
     }

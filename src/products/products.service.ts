@@ -61,7 +61,9 @@ export class ProductsService {
 
     const [products, total] = await query.getManyAndCount();
 
-    this.logger.log(`Found ${total} products. Got ${products.length} items.`);
+    this.logger.log(
+      `Found ${total} products (keyword="${options.keyword}", page=${options.page}, limit=${options.limit})`,
+    );
 
     return [products.map((product) => Product.fromJSON(product)), total];
   }
