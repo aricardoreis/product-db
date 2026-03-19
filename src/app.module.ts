@@ -19,6 +19,19 @@ import { LoggerModule } from 'nestjs-pino';
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+        serializers: {
+          req(req) {
+            const { authorization, cookie, ...safeHeaders } =
+              req.raw?.headers || {};
+            return {
+              id: req.id,
+              method: req.method,
+              url: req.url,
+              query: req.query,
+              headers: safeHeaders,
+            };
+          },
+        },
         transport: {
           targets: [
             {
