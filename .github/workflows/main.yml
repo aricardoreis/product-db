@@ -50,11 +50,11 @@ jobs:
         username: ${{ secrets.RASPI_USERNAME }}
         password: ${{ secrets.RASPI_PASSWORD }}
         port: 22
-        source: "dist/**"
+        source: "dist/**,package.json,package-lock.json"
         target: "Documents/code/product-db"
         overwrite: true
 
-    - name: Reload application on target host
+    - name: Install dependencies and reload on target host
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.RASPI_HOST }}
@@ -62,5 +62,6 @@ jobs:
         password: ${{ secrets.RASPI_PASSWORD }}
         port: 22
         script: |
-          ${{ env.PM2_PATH }} status
+          cd Documents/code/product-db
+          npm ci --omit=dev
           ${{ env.PM2_PATH }} reload product-db-server-nest
