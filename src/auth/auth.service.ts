@@ -1,8 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { SupabaseService } from '../shared/supabase/supabase.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(private supabaseService: SupabaseService) {}
 
   async signIn(email: string, pass: string): Promise<any> {
@@ -26,7 +28,8 @@ export class AuthService {
       .auth.refreshSession({ refresh_token: refreshToken });
 
     if (error) {
-      throw new UnauthorizedException();
+      this.logger.error(`Failed to refresh session: ${error.message}`);
+      throw new UnauthorizedException(error.message);
     }
 
     const { access_token, expires_in, expires_at, refresh_token, token_type } =
