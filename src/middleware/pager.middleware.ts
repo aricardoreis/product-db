@@ -1,7 +1,10 @@
-import { Logger, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';
 
+@Injectable()
 export class PagerMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(PagerMiddleware.name);
+  constructor(private readonly logger: PinoLogger) {}
+
   use(req: any, _res: any, next: (error?: any) => void) {
     const limit = Math.abs(+req.query.limit) || 10;
     const page = Math.abs(+req.query.page) || 1;
@@ -12,7 +15,7 @@ export class PagerMiddleware implements NestMiddleware {
       configurable: true,
     });
 
-    this.logger.log(`pager ${limit} ${page}`);
+    this.logger.assign({ pager: { limit, page } });
 
     next();
   }
