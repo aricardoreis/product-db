@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -7,12 +7,13 @@ import { PriceHistory } from './entities/price-history.entity';
 import { PaginationAndFilterOptions } from 'src/paginate';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SortingParam } from 'src/decorators/sorting-params.decorator';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class ProductsService {
-  private readonly logger = new Logger(ProductsService.name);
-
   constructor(
+    @InjectPinoLogger(ProductsService.name)
+    private readonly logger: PinoLogger,
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(PriceHistory)
     private priceHistoryRepository: Repository<PriceHistory>,
@@ -61,9 +62,14 @@ export class ProductsService {
 
     const [products, total] = await query.getManyAndCount();
 
-    this.logger.log(
-      `Found ${total} products (keyword="${options.keyword}", page=${options.page}, limit=${options.limit})`,
-    );
+    this.logger.assign({
+      productsQuery: {
+        total,
+        keyword: options.keyword,
+        page: options.page,
+        limit: options.limit,
+      },
+    });
 
     return [products.map((product) => Product.fromJSON(product)), total];
   }

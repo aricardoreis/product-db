@@ -13,6 +13,7 @@ import { InvoiceData } from './dto/invoice-data.dto';
 import { Sale } from './entity/sale.entity';
 import { InvoiceService } from './invoice.service';
 import { SalesService } from './sales.service';
+import { getLoggerToken } from 'nestjs-pino';
 
 describe('SalesService', () => {
   let service: SalesService;
@@ -33,6 +34,16 @@ describe('SalesService', () => {
       imports: [ConfigModule.forRoot()],
       providers: [
         SalesService,
+        {
+          provide: getLoggerToken(SalesService.name),
+          useValue: {
+            assign: jest.fn(),
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
         {
           provide: InvoiceService,
           useValue: invoiceServiceMock,
@@ -191,6 +202,8 @@ describe('SalesService', () => {
       sale: {
         id: 'SALE_ID',
       },
+      store: { name: 'Test Store' },
+      products: [],
     };
 
     invoiceServiceMock.fetchData.mockReturnValue(Promise.resolve(invoiceData));

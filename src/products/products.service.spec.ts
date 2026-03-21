@@ -11,6 +11,7 @@ import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SortingParam } from 'src/decorators/sorting-params.decorator';
+import { getLoggerToken } from 'nestjs-pino';
 
 const product = {
   id: 1234,
@@ -36,6 +37,16 @@ describe('ProductsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
+        {
+          provide: getLoggerToken(ProductsService.name),
+          useValue: {
+            assign: jest.fn(),
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
         {
           provide: getRepositoryToken(Product),
           useFactory: repositoryMockFactory,

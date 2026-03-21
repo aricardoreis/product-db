@@ -1,6 +1,5 @@
 import {
   Injectable,
-  Logger,
   ConflictException,
   BadRequestException,
   NotFoundException,
@@ -13,12 +12,13 @@ import { Sale } from './entity/sale.entity';
 import { InvoiceService } from './invoice.service';
 import { SaleDetails } from './dto/sale-details.dto';
 import { PaginationOptions } from 'src/paginate';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class SalesService {
-  private readonly logger = new Logger(SalesService.name);
-
   constructor(
+    @InjectPinoLogger(SalesService.name)
+    private readonly logger: PinoLogger,
     @InjectRepository(Sale) private saleRepository: Repository<Sale>,
     private readonly invoiceService: InvoiceService,
     private readonly storesService: StoresService,
@@ -61,16 +61,14 @@ export class SalesService {
       order: { date: 'DESC' },
     });
 
-    this.logger.log(
-      `Found ${total} sales (page=${options.page}, limit=${options.limit})`,
-    );
+    this.logger.assign({
+      salesQuery: { total, page: options.page, limit: options.limit },
+    });
 
     return [data.map((sale) => Sale.fromJSON(sale)), total];
   }
 
   async create(url: string): Promise<string> {
-    this.logger.log('Loading invoice data', url);
-
     // Validate URL
     if (!url || typeof url !== 'string') {
       throw new BadRequestException('Invalid URL provided');
@@ -79,7 +77,13 @@ export class SalesService {
     try {
       const invoiceData = await this.invoiceService.fetchData(url);
 
-      this.logger.log(`Invoice data loaded: ${JSON.stringify(invoiceData)}`);
+      this.logger.assign({
+        invoice: {
+          saleId: invoiceData.sale.id,
+          productCount: invoiceData.products.length,
+          storeName: invoiceData.store.name,
+        },
+      });
 
       // check if sale exists
       const sale = await this.saleRepository.findOne({
@@ -93,15 +97,11 @@ export class SalesService {
 
       const store = await this.storesService.create(invoiceData.store);
 
-      this.logger.log(`Store created/updated: ${store.name}`);
-
       await this.saleRepository.save({
         ...invoiceData.sale,
         store: store,
         invoiceUrl: url,
       });
-
-      this.logger.log(`Sale created with id: ${invoiceData.sale.id}`);
 
       // create products
       await Promise.all(
@@ -113,8 +113,6 @@ export class SalesService {
             }),
         ),
       );
-
-      this.logger.log(`Products created: ${invoiceData.products.length}`);
 
       return invoiceData.sale.id;
     } catch (error) {

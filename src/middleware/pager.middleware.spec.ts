@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
+import { LoggerModule } from 'nestjs-pino';
 import { PagerMiddleware } from './pager.middleware';
 
 @Controller('test')
@@ -26,6 +27,7 @@ class TestController {
 }
 
 @Module({
+  imports: [LoggerModule.forRoot()],
   controllers: [TestController],
 })
 class TestModule {
