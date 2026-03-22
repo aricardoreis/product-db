@@ -63,7 +63,7 @@ export class ProductsService {
     const [products, total] = await query.getManyAndCount();
 
     this.logger.assign({
-      productsQuery: {
+      _query: {
         total,
         keyword: options.keyword,
         page: options.page,

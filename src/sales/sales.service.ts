@@ -62,7 +62,7 @@ export class SalesService {
     });
 
     this.logger.assign({
-      salesQuery: { total, page: options.page, limit: options.limit },
+      _query: { total, page: options.page, limit: options.limit },
     });
 
     return [data.map((sale) => Sale.fromJSON(sale)), total];
@@ -78,7 +78,7 @@ export class SalesService {
       const invoiceData = await this.invoiceService.fetchData(url);
 
       this.logger.assign({
-        invoice: {
+        _invoice: {
           saleId: invoiceData.sale.id,
           productCount: invoiceData.products.length,
           storeName: invoiceData.store.name,

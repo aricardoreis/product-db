@@ -15,7 +15,7 @@ export class PagerMiddleware implements NestMiddleware {
       configurable: true,
     });
 
-    this.logger.assign({ pager: { limit, page } });
+    this.logger.assign({ _pager: { limit, page } });
 
     next();
   }
