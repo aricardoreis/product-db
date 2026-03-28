@@ -8,6 +8,7 @@ import { PaginationAndFilterOptions } from 'src/paginate';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SortingParam } from 'src/decorators/sorting-params.decorator';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { isValidEAN } from './ean.utils';
 
 @Injectable()
 export class ProductsService {
@@ -103,7 +104,7 @@ export class ProductsService {
       const newProduct: Product = {
         id: undefined,
         ...product,
-        isEan: this.hasEANCode(product),
+        isEan: isValidEAN(product.code),
         priceHistory: [],
       };
       result = await this.productRepository.save(newProduct);
@@ -135,7 +136,4 @@ export class ProductsService {
     });
   }
 
-  private hasEANCode(product: CreateProductDto): boolean {
-    return product.code.length === 13 || product.code.length === 8;
-  }
 }
