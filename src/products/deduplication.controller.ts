@@ -21,7 +21,11 @@ export class DeduplicationController {
     @Query('search') search?: string,
   ) {
     const t = threshold ? parseFloat(threshold) : undefined;
-    return this.deduplicationService.findDuplicateClusters(t, search);
+    const clusters = await this.deduplicationService.findDuplicateClusters(
+      t,
+      search,
+    );
+    return { clusters };
   }
 
   @Post('merge')

@@ -61,7 +61,7 @@ describe('DeduplicationController', () => {
 
       const result = await controller.findDuplicates();
 
-      expect(result).toEqual(mockClusters);
+      expect(result).toEqual({ clusters: mockClusters });
       expect(service.findDuplicateClusters).toHaveBeenCalledWith(
         undefined,
         undefined,
