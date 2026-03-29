@@ -49,10 +49,7 @@ export class ProductsService {
         'product.type',
         'product.code',
         'product.amount',
-        'priceHistory.date',
-        'priceHistory.value',
-      ])
-      .leftJoin('product.priceHistory', 'priceHistory');
+      ]);
 
     if (sort) {
       query = query.orderBy(
@@ -66,6 +63,26 @@ export class ProductsService {
 
     const [products, total] = await query.getManyAndCount();
 
+    // Fetch latest price for each product via a single query
+    const ids = products.map((p) => p.id);
+    const latestPrices: { product_id: number; value: string; date: Date }[] =
+      ids.length > 0
+        ? await this.productRepository.query(
+            `SELECT DISTINCT ON (product_id) product_id, value, date
+             FROM price_history
+             WHERE product_id = ANY($1)
+             ORDER BY product_id, date DESC`,
+            [ids],
+          )
+        : [];
+
+    const priceMap = new Map(
+      latestPrices.map((p) => [
+        Number(p.product_id),
+        { value: parseFloat(p.value), date: p.date },
+      ]),
+    );
+
     this.logger.assign({
       _query: {
         total,
@@ -75,7 +92,19 @@ export class ProductsService {
       },
     });
 
-    return [products.map((product) => Product.fromJSON(product)), total];
+    return [
+      products.map((product) => ({
+        id: product.id,
+        name: product.name,
+        code: product.code,
+        amount: parseFloat(product.amount as any),
+        type: product.type,
+        priceHistory: priceMap.has(product.id)
+          ? [priceMap.get(product.id)]
+          : [],
+      })) as Product[],
+      total,
+    ];
   }
 
   async findByCode(code: string): Promise<Product> {

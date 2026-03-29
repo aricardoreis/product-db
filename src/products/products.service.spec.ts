@@ -79,17 +79,18 @@ describe('ProductsService', () => {
 
     const createQueryBuilder: any = {
       select: () => createQueryBuilder,
-      leftJoin: () => createQueryBuilder,
       take: () => createQueryBuilder,
       skip: () => createQueryBuilder,
       where: () => createQueryBuilder,
       orderBy: () => createQueryBuilder,
-      addOrderBy: () => createQueryBuilder,
       getManyAndCount: () => {
         return [products, totalProducts];
       },
     };
     repositoryMock.createQueryBuilder.mockReturnValue(createQueryBuilder);
+    (repositoryMock as any).query.mockResolvedValue([
+      { product_id: product.id, value: '9.99', date: new Date() },
+    ]);
 
     const paginationOptions = {
       limit: 5,
