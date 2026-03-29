@@ -84,6 +84,7 @@ describe('ProductsService', () => {
       skip: () => createQueryBuilder,
       where: () => createQueryBuilder,
       orderBy: () => createQueryBuilder,
+      addOrderBy: () => createQueryBuilder,
       getManyAndCount: () => {
         return [products, totalProducts];
       },
