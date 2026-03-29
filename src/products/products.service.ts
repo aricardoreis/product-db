@@ -64,8 +64,6 @@ export class ProductsService {
       query = query.orderBy('product.name', 'ASC');
     }
 
-    query = query.addOrderBy('priceHistory.date', 'DESC');
-
     const [products, total] = await query.getManyAndCount();
 
     this.logger.assign({
