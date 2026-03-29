@@ -15,6 +15,7 @@ const mockClusters: DuplicateCluster[] = [
         code: '001',
         isEan: false,
         priceHistoryCount: 3,
+        latestPrice: 4.99,
       },
       {
         id: 2,
@@ -22,6 +23,7 @@ const mockClusters: DuplicateCluster[] = [
         code: '002',
         isEan: false,
         priceHistoryCount: 5,
+        latestPrice: 5.49,
       },
     ],
   },

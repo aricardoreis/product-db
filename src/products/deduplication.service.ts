@@ -22,6 +22,7 @@ export interface ClusterProduct {
   code: string;
   isEan: boolean;
   priceHistoryCount: number;
+  latestPrice: number | null;
 }
 
 export interface DuplicateCluster {
@@ -113,20 +114,26 @@ export class DeduplicationService {
 
     // Fetch product details + price history count
     const allIds = [...productIds];
-    const products: (Product & { priceHistoryCount: number })[] =
-      await this.productRepository
-        .createQueryBuilder('p')
-        .select([
-          'p.id AS "id"',
-          'p.name AS "name"',
-          'p.code AS "code"',
-          'p.is_ean AS "isEan"',
-          'COUNT(ph.id)::int AS "priceHistoryCount"',
-        ])
-        .leftJoin(PriceHistory, 'ph', 'ph.product_id = p.id')
-        .where('p.id IN (:...ids)', { ids: allIds })
-        .groupBy('p.id')
-        .getRawMany();
+    const products: (Product & {
+      priceHistoryCount: number;
+      latestPrice: number | null;
+    })[] = await this.productRepository
+      .createQueryBuilder('p')
+      .select([
+        'p.id AS "id"',
+        'p.name AS "name"',
+        'p.code AS "code"',
+        'p.is_ean AS "isEan"',
+        'COUNT(ph.id)::int AS "priceHistoryCount"',
+        `(SELECT ph2.value FROM price_history ph2
+          WHERE ph2.product_id = p.id
+          ORDER BY ph2.date DESC LIMIT 1
+        )::numeric AS "latestPrice"`,
+      ])
+      .leftJoin(PriceHistory, 'ph', 'ph.product_id = p.id')
+      .where('p.id IN (:...ids)', { ids: allIds })
+      .groupBy('p.id')
+      .getRawMany();
 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -146,6 +153,9 @@ export class DeduplicationService {
             code: p.code,
             isEan: p.isEan,
             priceHistoryCount: p.priceHistoryCount,
+            latestPrice: p.latestPrice
+              ? parseFloat(p.latestPrice as any)
+              : null,
           })),
       });
     }
