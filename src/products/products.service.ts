@@ -26,6 +26,9 @@ export class ProductsService {
       relations: {
         priceHistory: true,
       },
+      order: {
+        priceHistory: { date: 'DESC' },
+      },
     });
   }
 
@@ -60,6 +63,8 @@ export class ProductsService {
       // default sorting
       query = query.orderBy('product.name', 'ASC');
     }
+
+    query = query.addOrderBy('priceHistory.date', 'DESC');
 
     const [products, total] = await query.getManyAndCount();
 
