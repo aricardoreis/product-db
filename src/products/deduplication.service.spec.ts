@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { Product } from './entities/product.entity';
 import { DeduplicationService } from './deduplication.service';
 import { getLoggerToken } from 'nestjs-pino';
@@ -55,9 +56,10 @@ describe('DeduplicationService', () => {
 
   describe('findDuplicateClusters', () => {
     it('should return empty array when no similar pairs found', async () => {
-      productRepoMock.query
-        .mockResolvedValueOnce(undefined) // SET threshold
-        .mockResolvedValueOnce([]); // pair query
+      dataSourceMock.transaction.mockImplementation(async (cb) => {
+        const manager = { query: jest.fn().mockResolvedValue([]) };
+        return cb(manager);
+      });
 
       const result = await service.findDuplicateClusters();
 
@@ -66,13 +68,19 @@ describe('DeduplicationService', () => {
 
     it('should group pairs into clusters using connected components', async () => {
       // A≈B, B≈C → cluster {A, B, C}; D≈E → cluster {D, E}
-      productRepoMock.query
-        .mockResolvedValueOnce(undefined) // SET threshold
-        .mockResolvedValueOnce([
-          { idA: 1, idB: 2, similarity: 0.8 },
-          { idA: 2, idB: 3, similarity: 0.5 },
-          { idA: 10, idB: 20, similarity: 0.6 },
-        ]);
+      dataSourceMock.transaction.mockImplementation(async (cb) => {
+        const manager = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce(undefined) // SET LOCAL threshold
+            .mockResolvedValueOnce([
+              { idA: 1, idB: 2, similarity: 0.8 },
+              { idA: 2, idB: 3, similarity: 0.5 },
+              { idA: 10, idB: 20, similarity: 0.6 },
+            ]),
+        };
+        return cb(manager);
+      });
 
       const queryBuilder: any = {
         select: jest.fn().mockReturnThis(),
@@ -139,25 +147,35 @@ describe('DeduplicationService', () => {
     });
 
     it('should use custom threshold when provided', async () => {
-      productRepoMock.query
-        .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce([]);
+      let capturedManager: Record<string, jest.Mock>;
+      dataSourceMock.transaction.mockImplementation(async (cb) => {
+        capturedManager = { query: jest.fn().mockResolvedValue([]) };
+        return cb(capturedManager);
+      });
 
       await service.findDuplicateClusters(0.7);
 
-      expect(productRepoMock.query).toHaveBeenCalledWith(
-        'SET pg_trgm.similarity_threshold = 0.7',
+      expect(capturedManager.query).toHaveBeenCalledWith(
+        'SET LOCAL pg_trgm.similarity_threshold = $1',
+        [0.7],
       );
     });
 
     it('should filter by search term when provided', async () => {
-      productRepoMock.query
-        .mockResolvedValueOnce(undefined)
-        .mockResolvedValueOnce([]);
+      let capturedManager: Record<string, jest.Mock>;
+      dataSourceMock.transaction.mockImplementation(async (cb) => {
+        capturedManager = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce([]),
+        };
+        return cb(capturedManager);
+      });
 
       await service.findDuplicateClusters(0.4, 'abacaxi');
 
-      expect(productRepoMock.query).toHaveBeenCalledWith(
+      expect(capturedManager.query).toHaveBeenCalledWith(
         expect.stringContaining('ILIKE'),
         ['%abacaxi%'],
       );
@@ -165,15 +183,15 @@ describe('DeduplicationService', () => {
   });
 
   describe('mergeProducts', () => {
-    it('should throw when canonical product not found', async () => {
+    it('should throw NotFoundException when canonical product not found', async () => {
       productRepoMock.findOne.mockResolvedValue(null);
 
       await expect(service.mergeProducts(999, [1, 2])).rejects.toThrow(
-        'Canonical product 999 not found',
+        NotFoundException,
       );
     });
 
-    it('should throw when some duplicate products not found', async () => {
+    it('should throw BadRequestException when some duplicate products not found', async () => {
       productRepoMock.findOne.mockResolvedValue({
         id: 1,
         name: 'Canonical',
@@ -187,7 +205,7 @@ describe('DeduplicationService', () => {
       productRepoMock.createQueryBuilder.mockReturnValue(queryBuilder);
 
       await expect(service.mergeProducts(1, [2, 3])).rejects.toThrow(
-        'Duplicate products not found: 3',
+        BadRequestException,
       );
     });
 

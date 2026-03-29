@@ -20,12 +20,6 @@ export class DeduplicationController {
     @Query('threshold') threshold?: string,
     @Query('search') search?: string,
   ) {
-    console.log(
-      'Finding duplicates with threshold:',
-      threshold,
-      'and search:',
-      search,
-    );
     const t = threshold ? parseFloat(threshold) : undefined;
     return this.deduplicationService.findDuplicateClusters(t, search);
   }

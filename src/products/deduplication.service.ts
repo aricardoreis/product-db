@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
@@ -39,11 +43,8 @@ export class DeduplicationService {
     threshold = 0.4,
     search?: string,
   ): Promise<DuplicateCluster[]> {
-    // Set threshold for the % operator so the GIN index is used
-    await this.productRepository.query(
-      `SET pg_trgm.similarity_threshold = ${Number(threshold)}`,
-    );
-
+    // Use SET LOCAL inside a transaction so the threshold doesn't leak
+    // to other queries on the same pooled connection
     const params: string[] = [];
     let searchFilter = '';
 
@@ -52,14 +53,21 @@ export class DeduplicationService {
       searchFilter = `AND (a.name ILIKE $1 OR b.name ILIKE $1)`;
     }
 
-    const pairs: SimilarPair[] = await this.productRepository.query(
-      `SELECT a.id AS "idA", b.id AS "idB",
-              similarity(a.name, b.name) AS "similarity"
-       FROM products a
-       JOIN products b ON a.id < b.id AND a.name % b.name
-       WHERE true ${searchFilter}
-       ORDER BY similarity(a.name, b.name) DESC`,
-      params,
+    const pairs: SimilarPair[] = await this.dataSource.transaction(
+      async (manager) => {
+        await manager.query(`SET LOCAL pg_trgm.similarity_threshold = $1`, [
+          threshold,
+        ]);
+        return manager.query(
+          `SELECT a.id AS "idA", b.id AS "idB",
+                  similarity(a.name, b.name) AS "similarity"
+           FROM products a
+           JOIN products b ON a.id < b.id AND a.name % b.name
+           WHERE true ${searchFilter}
+           ORDER BY similarity(a.name, b.name) DESC`,
+          params,
+        );
+      },
     );
 
     if (pairs.length === 0) return [];
@@ -158,7 +166,7 @@ export class DeduplicationService {
       where: { id: canonicalId },
     });
     if (!canonical) {
-      throw new Error(`Canonical product ${canonicalId} not found`);
+      throw new NotFoundException(`Canonical product ${canonicalId} not found`);
     }
 
     // Validate duplicates exist
@@ -170,7 +178,9 @@ export class DeduplicationService {
     if (duplicates.length !== duplicateIds.length) {
       const foundIds = duplicates.map((d) => d.id);
       const missing = duplicateIds.filter((id) => !foundIds.includes(id));
-      throw new Error(`Duplicate products not found: ${missing.join(', ')}`);
+      throw new BadRequestException(
+        `Duplicate products not found: ${missing.join(', ')}`,
+      );
     }
 
     // Check if any duplicate has a valid EAN that the canonical lacks
