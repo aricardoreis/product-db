@@ -156,8 +156,13 @@ describe('DeduplicationService', () => {
       await service.findDuplicateClusters(0.7);
 
       expect(capturedManager.query).toHaveBeenCalledWith(
-        'SET LOCAL pg_trgm.similarity_threshold = $1',
-        [0.7],
+        'SET LOCAL pg_trgm.similarity_threshold = 0.7',
+      );
+    });
+
+    it('should throw BadRequestException for invalid threshold', async () => {
+      await expect(service.findDuplicateClusters(NaN)).rejects.toThrow(
+        BadRequestException,
       );
     });
 

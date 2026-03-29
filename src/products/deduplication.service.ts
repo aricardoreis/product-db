@@ -45,6 +45,11 @@ export class DeduplicationService {
   ): Promise<DuplicateCluster[]> {
     // Use SET LOCAL inside a transaction so the threshold doesn't leak
     // to other queries on the same pooled connection
+    const safeThreshold = Number(threshold);
+    if (!Number.isFinite(safeThreshold)) {
+      throw new BadRequestException(`Invalid threshold: ${threshold}`);
+    }
+
     const params: string[] = [];
     let searchFilter = '';
 
@@ -55,9 +60,9 @@ export class DeduplicationService {
 
     const pairs: SimilarPair[] = await this.dataSource.transaction(
       async (manager) => {
-        await manager.query(`SET LOCAL pg_trgm.similarity_threshold = $1`, [
-          threshold,
-        ]);
+        await manager.query(
+          `SET LOCAL pg_trgm.similarity_threshold = ${safeThreshold}`,
+        );
         return manager.query(
           `SELECT a.id AS "idA", b.id AS "idB",
                   similarity(a.name, b.name) AS "similarity"
