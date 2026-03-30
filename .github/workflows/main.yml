@@ -6,6 +6,13 @@ name: Build and deploy
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'nest-cli.json'
 
 env:
   PM2_PATH: ${{ secrets.PM2_PATH }}
