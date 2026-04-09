@@ -1,7 +1,7 @@
-import { Injectable, Logger, Scope } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class SupabaseService {
   private readonly logger = new Logger(SupabaseService.name);
   private supabaseClient: SupabaseClient;
@@ -17,8 +17,9 @@ export class SupabaseService {
       process.env.SUPABASE_KEY,
       {
         auth: {
-          autoRefreshToken: true,
+          autoRefreshToken: false,
           detectSessionInUrl: false,
+          persistSession: false,
         },
       },
     );
