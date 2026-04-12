@@ -31,7 +31,7 @@
     "@nestjs/platform-express": "^11.0.0",
     "@nestjs/typeorm": "^11.0.0",
     "@supabase/supabase-js": "^2.44.1",
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
     "nestjs-pino": "^4.6.1",
     "nestjs-supabase-auth": "^1.0.9",
     "passport": "^0.7.0",
