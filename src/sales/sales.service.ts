@@ -68,14 +68,13 @@ export class SalesService {
     return [data.map((sale) => Sale.fromJSON(sale)), total];
   }
 
-  async create(url: string): Promise<string> {
-    // Validate URL
-    if (!url || typeof url !== 'string') {
-      throw new BadRequestException('Invalid URL provided');
+  async create(input: { url?: string; html?: string }): Promise<string> {
+    if (!input.url && !input.html) {
+      throw new BadRequestException('You must provide either a URL or HTML content');
     }
 
     try {
-      const invoiceData = await this.invoiceService.fetchData(url);
+      const invoiceData = await this.invoiceService.fetchData(input);
 
       this.logger.assign({
         _invoice: {
@@ -100,7 +99,7 @@ export class SalesService {
       await this.saleRepository.save({
         ...invoiceData.sale,
         store: store,
-        invoiceUrl: url,
+        invoiceUrl: input.url || null,
       });
 
       // create products

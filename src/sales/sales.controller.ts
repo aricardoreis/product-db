@@ -33,6 +33,6 @@ export class SalesController {
 
   @Post()
   async create(@Body() createSaleDto: CreateSaleDto): Promise<string> {
-    return this.salesService.create(createSaleDto.url);
+    return this.salesService.create(createSaleDto);
   }
 }

@@ -69,6 +69,6 @@ describe('SalesController', () => {
     const result = await controller.create(saleToBeCreated);
 
     expect(result).toHaveProperty('id', sale.id);
-    expect(serviceMock.create).toHaveBeenCalledWith(saleToBeCreated.url);
+    expect(serviceMock.create).toHaveBeenCalledWith(saleToBeCreated);
   });
 });

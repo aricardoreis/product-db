@@ -1,3 +1,4 @@
 export class CreateSaleDto {
-  url: string;
+  url?: string;
+  html?: string;
 }

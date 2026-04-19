@@ -29,8 +29,8 @@ export class Sale {
   @OneToMany(() => PriceHistory, (priceHistory) => priceHistory.sale)
   priceHistory: PriceHistory[];
 
-  @Column({ name: 'invoice_url' })
-  invoiceUrl: string;
+  @Column({ name: 'invoice_url', nullable: true })
+  invoiceUrl?: string;
 
   static fromJSON(data: any): Sale {
     return {
