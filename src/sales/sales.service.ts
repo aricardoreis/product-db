@@ -70,7 +70,9 @@ export class SalesService {
 
   async create(input: { url?: string; html?: string }): Promise<string> {
     if (!input.url && !input.html) {
-      throw new BadRequestException('You must provide either a URL or HTML content');
+      throw new BadRequestException(
+        'You must provide either a URL or HTML content',
+      );
     }
 
     try {

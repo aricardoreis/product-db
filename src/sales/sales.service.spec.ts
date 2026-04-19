@@ -251,7 +251,9 @@ describe('SalesService', () => {
     invoiceServiceMock.fetchData.mockReturnValue(Promise.resolve(invoiceData));
     repositoryMock.findOne.mockReturnValueOnce({ id: 'SALE_ID' });
 
-    await expect(service.create({ url: 'url' })).rejects.toThrow('Sale already exists');
+    await expect(service.create({ url: 'url' })).rejects.toThrow(
+      'Sale already exists',
+    );
   });
 
   it('should throw BadRequestException when neither url nor html is provided', async () => {
