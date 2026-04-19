@@ -16,15 +16,16 @@ export class InvoiceService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async fetchData(url: string): Promise<InvoiceData> {
+  async fetchData(input: {
+    url?: string;
+    html?: string;
+  }): Promise<InvoiceData> {
     this.logger.log(
       `Fetching invoice data from server: ${process.env.INVOICE_URL}`,
     );
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(process.env.INVOICE_URL, {
-          url: url,
-        }),
+        this.httpService.post(process.env.INVOICE_URL, input),
       );
       return InvoiceData.fromJSON(data.result);
     } catch (error) {

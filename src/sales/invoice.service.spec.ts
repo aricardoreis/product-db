@@ -72,7 +72,7 @@ describe('InvoiceService', () => {
 
     httpServiceMock.post.mockImplementationOnce(() => of(response));
 
-    const data = await service.fetchData(url);
+    const data = await service.fetchData({ url });
 
     expect(data).toEqual(InvoiceData.fromJSON(PRODUCT_DB_DATA.result));
   });

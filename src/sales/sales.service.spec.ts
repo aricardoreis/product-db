@@ -183,7 +183,7 @@ describe('SalesService', () => {
       Promise.resolve({ ...invoiceData.store }),
     );
 
-    const saleId = await service.create(url);
+    const saleId = await service.create({ url });
 
     expect(saleId).toEqual(invoiceData.sale.id);
     expect(repositoryMock.save).toHaveBeenCalledWith({
@@ -195,6 +195,48 @@ describe('SalesService', () => {
       invoiceData.products.length,
     );
     expect(storeServiceMock.create).toHaveBeenCalledWith(invoiceData.store);
+  });
+
+  it('should create a sale from html content with null invoiceUrl', async () => {
+    const html = '<html><body>invoice html content</body></html>';
+    const invoiceData: InvoiceData = {
+      store: {
+        id: 'STORE_ID',
+        name: 'Test Store',
+        address: 'Test Address',
+      },
+      sale: {
+        id: 'SALE_ID',
+        total: 58.22,
+        date: '2026-04-18',
+      },
+      products: [
+        {
+          name: 'PIPOCA DOC JUPOCA40G',
+          value: 1.89,
+          code: '92765',
+          amount: 1,
+          type: 'Un',
+          date: '2026-04-18',
+        },
+      ],
+    };
+
+    invoiceServiceMock.fetchData.mockReturnValue(Promise.resolve(invoiceData));
+    repositoryMock.findOne.mockReturnValueOnce(null);
+    storeServiceMock.create.mockReturnValue(
+      Promise.resolve({ ...invoiceData.store }),
+    );
+
+    const saleId = await service.create({ html });
+
+    expect(saleId).toEqual(invoiceData.sale.id);
+    expect(invoiceServiceMock.fetchData).toHaveBeenCalledWith({ html });
+    expect(repositoryMock.save).toHaveBeenCalledWith({
+      ...invoiceData.sale,
+      invoiceUrl: null,
+      store: invoiceData.store,
+    });
   });
 
   it('it should throw an error when a sale already exists', async () => {
@@ -209,19 +251,18 @@ describe('SalesService', () => {
     invoiceServiceMock.fetchData.mockReturnValue(Promise.resolve(invoiceData));
     repositoryMock.findOne.mockReturnValueOnce({ id: 'SALE_ID' });
 
-    await expect(service.create('url')).rejects.toThrow('Sale already exists');
+    await expect(service.create({ url: 'url' })).rejects.toThrow(
+      'Sale already exists',
+    );
   });
 
-  it('should throw BadRequestException for invalid URL', async () => {
-    // Test with null URL
-    await expect(service.create(null)).rejects.toThrow('Invalid URL provided');
+  it('should throw BadRequestException when neither url nor html is provided', async () => {
+    await expect(service.create({})).rejects.toThrow(
+      'You must provide either a URL or HTML content',
+    );
 
-    // Test with empty string URL
-    await expect(service.create('')).rejects.toThrow('Invalid URL provided');
-
-    // Test with non-string URL
-    await expect(service.create(123 as any)).rejects.toThrow(
-      'Invalid URL provided',
+    await expect(service.create({ url: '', html: '' })).rejects.toThrow(
+      'You must provide either a URL or HTML content',
     );
   });
 });
