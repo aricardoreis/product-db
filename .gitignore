@@ -396,6 +396,7 @@ Temporary Items
 # Local
 .env
 .env-supabase
+*.bak
 dist
 .webpack
 .serverless/**/*.zip

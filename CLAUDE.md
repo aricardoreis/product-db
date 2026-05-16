@@ -28,7 +28,8 @@ npm run lint            # ESLint with auto-fix
 npm run format          # Prettier format
 
 # Database (local dev)
-docker compose up -d db  # Start Postgres 12 on port 5432
+docker compose up -d db       # Start Postgres 12 on port 5432
+docker compose down -v        # Stop and wipe data volume (forces re-seed on next up)
 ```
 
 ## Environment Variables
@@ -47,6 +48,20 @@ The app requires these env vars (use a `.env` file via `@nestjs/config`):
 | `NODE_ENV` | Set to `development` to disable authentication guard |
 
 Local Postgres defaults (from `docker-compose.yml`): user/password/db all `postgres`, port `5432`.
+
+## Local Development Setup
+
+For local development with an isolated, empty database (so the Flutter app or tests don't hit production data):
+
+1. **`.env`** — copy from `.env-local` and append `NODE_ENV=development` (skips `SupabaseGuard`). `INVOICE_URL` can stay pointing at the prod scraper.
+2. **`docker compose up -d db`** — first start seeds the database by running `/docker-entrypoint-initdb.d/*.sql` in alphabetical order:
+   - `schema.sql` (mounted as `01-schema.sql`) creates the four tables: `stores`, `products`, `sales`, `price_history`.
+   - `dummy_data.sql` (mounted as `02-dummy-data.sql`) inserts a small fixture: 3 stores, 5 products, 3 sales, 8 price-history rows. Edit this file to change the seed.
+3. **`npm run start:dev`** — Nest listens on `0.0.0.0:3000` (LAN-accessible by default for physical-device testing).
+
+**Re-seeding rule:** init scripts only run when the data volume is empty. To pick up changes to `schema.sql` or `dummy_data.sql`, run `docker compose down -v && docker compose up -d db` (the `-v` wipes the volume).
+
+**Schema source of truth:** `schema.sql` is hand-maintained (no TypeORM migrations, no `synchronize`). If you add or change an `@Entity()`, mirror the change in `schema.sql`.
 
 ## Architecture
 
