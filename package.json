@@ -23,7 +23,7 @@
   "dependencies": {
     "@axiomhq/pino": "^1.4.0",
     "@nestjs/axios": "^4.0.0",
-    "@nestjs/common": "^11.0.0",
+    "@nestjs/common": "^11.2.3",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/mapped-types": "^2.1.0",
@@ -101,5 +101,8 @@
       }
     },
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "multer": "^2.3.0"
   }
 }
